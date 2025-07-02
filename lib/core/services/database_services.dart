@@ -2,47 +2,67 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 import 'package:to_do_list/core/models/app_user.dart';
 
-class DBHelper {
+class DatabaseServices {
   static Database? _db;
 
-  static Future<Database> getDB() async {
-    if (_db != null) return _db!;
-    final dbPath = await databaseFactory.getDatabasesPath();
-    final path = join(dbPath, 'todo_app.db');
+  /// Initializes the database and creates tables schema if not exist
+  Future<Database> _initDB() async {
+    try {
+      final dbPath = await databaseFactoryFfi.getDatabasesPath();
+      final path = join(dbPath, 'todo_app.db');
 
-    _db = await databaseFactory.openDatabase(path,
+      return await databaseFactoryFfi.openDatabase(
+        path,
         options: OpenDatabaseOptions(
           version: 1,
-          onCreate: (db, version) async {
-            await db.execute('''
-        CREATE TABLE users (
-          
-          appUserId INTEGER PRIMARY KEY AUTOINCREMENT,
-          firstName TEXT,
-          lastName TEXT,
-          email TEXT,
-          phoneNumber TEXT,
-          password TEXT
-        )
-      ''');
-            print("✅ Users table created");
-          },
-        ));
-
-    print("✅ Database connected at: $path");
-
-    return _db!;
+          onCreate: _onCreate,
+          onConfigure: _onConfigure,
+        ),
+      );
+    } catch (e) {
+      print('❌ Error initializing database: $e');
+      rethrow;
+    }
   }
 
-  // static Future<void> insertUser(AppUser user) async {
-  //   final db = await getDB();
+  /// Enable foreign key constraints
+  Future<void> _onConfigure(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
+  }
 
-  //   await db.insert(
-  //     'users',
-  //     user, // Use your model's toMap method
-  //     conflictAlgorithm: ConflictAlgorithm.replace,
-  //   );
+  /// Creates all tables in the database
+  Future<void> _onCreate(Database db, int version) async {
+    try {
+      await db.execute('''
+            CREATE TABLE users (
+              appUserId INTEGER PRIMARY KEY AUTOINCREMENT,
+              firstName TEXT,
+              lastName TEXT,
+              email TEXT,
+              password TEXT
+            )
+          ''');
 
-  //   print("✅ User inserted successfully using model");
-  // }
+      await db.execute('''
+      CREATE TABLE todos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT,
+        status TEXT NOT NULL CHECK(status IN ('Active', 'Completed')),
+        createdAt TEXT NOT NULL,
+        updatedAt TEXT NOT NULL
+      )
+    ''');
+    } catch (e) {
+      print('❌ Error creating tables: $e');
+      rethrow;
+    }
+  }
+
+  Future<Database> get database async {
+    if (_db != null) return _db!;
+    _db = await _initDB();
+    return _db!;
+  }
+  // Optional: fetch users
 }

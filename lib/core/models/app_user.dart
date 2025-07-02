@@ -1,44 +1,58 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AppUser extends ChangeNotifier {
   String? appUserId;
   String? firstName;
-
-  String? userEmail;
+  String? email;
   String? lastName;
-  String? phoneNumber;
   String? password;
   String? confirmPassword;
 
   AppUser({
     this.appUserId,
-    this.userEmail,
+    this.email,
     this.firstName,
     this.lastName,
-    this.phoneNumber,
     this.password,
     this.confirmPassword,
   });
 
-  AppUser.fromJson(json, id) {
-    this.appUserId = id;
-
-    this.firstName = json['firstName'] ?? '';
-    this.userEmail = json['userEmail'];
-    this.lastName = json['lastName'];
-    this.phoneNumber = json['phoneNumber'] ?? '';
+  // For Firebase or JSON
+  AppUser.fromJson(Map<String, dynamic> json, String id) {
+    appUserId = id;
+    firstName = json['firstName'] ?? '';
+    email = json['email'];
+    lastName = json['lastName'];
   }
-  toJson() {
+
+  Map<String, dynamic> toJson() {
     return {
-      'firstName': this.firstName,
-
-      'userEmail': this.userEmail,
-      'phoneNumber': this.phoneNumber,
-      // 'yesterdayTime': this.yesterdayTime,
-
-      'lastName': this.lastName,
-      // 'notificationTime': this.notificationTime,
+      'firstName': firstName,
+      'appUserId': appUserId,
+      'email': email,
+      'password': password,
+      'confirmPassword': confirmPassword,
+      'lastName': lastName,
     };
+  }
+
+  // For SQLite
+  Map<String, dynamic> toMap() {
+    return {
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'password': password,
+    };
+  }
+
+  factory AppUser.fromMap(Map<String, dynamic> map) {
+    return AppUser(
+      appUserId: map['appUserId']?.toString(),
+      firstName: map['firstName'],
+      lastName: map['lastName'],
+      email: map['email'],
+      password: map['password'],
+    );
   }
 }

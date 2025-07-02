@@ -13,7 +13,7 @@ class AuthFormContainer extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           double width = constraints.maxWidth;
-          double formWidth = width > 800 ? 500 : width * 0.9;
+          double formWidth = width > 800 ? 380 : width * 0.9;
 
           return Center(
             child: Container(
@@ -36,5 +36,7 @@ class AuthFormContainer extends StatelessWidget {
         },
       ),
     );
+
+    //
   }
 }

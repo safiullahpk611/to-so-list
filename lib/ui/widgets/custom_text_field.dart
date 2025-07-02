@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
   final String hintText;
-  final TextEditingController myController;
+
   final TextInputType keyBoardType;
   final bool obscureText;
   final VoidCallback? ontap;
@@ -21,9 +21,8 @@ class CustomTextField extends StatelessWidget {
     required this.hintText,
     this.prefixIcon,
     this.onChanged,
-    this.foucsBorderColor = const Color(0xffD1E6FF),
+    this.foucsBorderColor = Colors.purple,
     this.readOnly = false,
-    required this.myController,
     required this.keyBoardType,
     required this.obscureText,
     this.ontap,
@@ -41,7 +40,6 @@ class CustomTextField extends StatelessWidget {
       readOnly: readOnly,
       onChanged: onChanged,
       validator: validator,
-      controller: myController,
       keyboardType: keyBoardType,
       obscureText: obscureText,
       textInputAction: textInputAction,
@@ -62,14 +60,14 @@ class CustomTextField extends StatelessWidget {
           fontWeight: FontWeight.w400,
         ),
         border: OutlineInputBorder(
-          borderSide: const BorderSide(color: Color(0xffD1D1D6)),
+          borderSide: const BorderSide(color: Colors.purpleAccent),
           borderRadius: BorderRadius.circular(14),
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xffD1D1D6), width: 1)),
+            borderSide: const BorderSide(color: Colors.purpleAccent, width: 1)),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: BorderSide(
