@@ -4,25 +4,37 @@ import 'package:to_do_list/core/services/database_services.dart';
 
 class AuthServices {
   DatabaseServices databaseServices = DatabaseServices();
-  Future<bool> insertUser(AppUser user) async {
+  Future<UserInsertResult> insertUser(AppUser user) async {
     try {
       final exists = await userExists(user.email ?? '');
       if (exists) {
-        print("⚠️ User already registered with this email.");
-        return false; // User already exists
+        print("User already registered with this email.");
+        return UserInsertResult(success: false, user: null);
       }
 
       final db = await databaseServices.database;
-      await db.insert(
-        'users',
+      final id = await db.insert(
+        'Users',
         user.toMap(),
         conflictAlgorithm: ConflictAlgorithm.abort,
       );
-      print("✅ User inserted into SQLite");
-      return true;
+
+      print("User inserted into SQLite with id $id");
+
+      // Return the inserted user (with id)
+      final insertedUser = UserInsertResult(
+          user: AppUser(
+              appUserId: id.toString(),
+              email: user.email,
+              password: user.password,
+              firstName: user.firstName,
+              lastName: user.lastName),
+          success: true);
+
+      return UserInsertResult(success: true, user: insertedUser.user);
     } catch (e) {
-      print("❌ Error inserting user: $e");
-      return false;
+      print("Error inserting user: $e");
+      return UserInsertResult(success: false, user: null);
     }
   }
 
@@ -53,7 +65,7 @@ class AuthServices {
         return null; // user not found
       }
     } catch (e) {
-      print("❌ Error fetching user: $e");
+      print("Error fetching user: $e");
       return null;
     }
   }

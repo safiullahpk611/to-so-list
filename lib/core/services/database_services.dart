@@ -20,7 +20,7 @@ class DatabaseServices {
         ),
       );
     } catch (e) {
-      print('❌ Error initializing database: $e');
+      print('Error initializing database: $e');
       rethrow;
     }
   }
@@ -44,17 +44,19 @@ class DatabaseServices {
           ''');
 
       await db.execute('''
-      CREATE TABLE todos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        description TEXT,
-        status TEXT NOT NULL CHECK(status IN ('Active', 'Completed')),
-        createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL
-      )
+     CREATE TABLE todos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  userId INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  status TEXT NOT NULL CHECK(status IN ('Active', 'Completed')),
+  createdAt TEXT NOT NULL,
+  updatedAt TEXT NOT NULL,
+  FOREIGN KEY (userId) REFERENCES users(appUserId) ON DELETE CASCADE
+)
     ''');
     } catch (e) {
-      print('❌ Error creating tables: $e');
+      print('Error creating tables: $e');
       rethrow;
     }
   }

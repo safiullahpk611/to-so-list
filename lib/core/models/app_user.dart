@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
-class AppUser extends ChangeNotifier {
+class UserInsertResult {
+  final bool success;
+  final AppUser? user;
+
+  UserInsertResult({required this.success, this.user});
+}
+
+class AppUser {
   String? appUserId;
   String? firstName;
   String? email;
