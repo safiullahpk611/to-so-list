@@ -16,16 +16,16 @@ class SignUpProvider extends BaseViewModal {
   final userEmailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-
+  bool isLoading = false;
   Future<void> userSignUp(BuildContext context, AppUser user) async {
     try {
       user.appUserId = "";
-      setState(ViewState.busy);
-
+      isLoading = true;
+      notifyListeners();
       final userInsertResult = await authServices.insertUser(user);
 
-      setState(ViewState.idle);
-
+      isLoading = false;
+      notifyListeners();
       if (userInsertResult != null) {
         final newUserId = userInsertResult.user!.appUserId!;
         final prefs = await SharedPreferences.getInstance();

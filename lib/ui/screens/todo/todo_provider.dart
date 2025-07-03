@@ -7,6 +7,10 @@ import 'package:to_do_list/ui/screens/auth/sign_in/sign_in.dart';
 
 class TodoProvider extends BaseViewModal {
   /// Constructor that optionally accepts a user ID
+  ///
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
   TodoProvider(String id) {
     if (id.isNotEmpty) {
       print("User ID received in constructor: $id");
@@ -61,8 +65,8 @@ class TodoProvider extends BaseViewModal {
 
     if (shouldLogout == true) {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.clear(); // Clear all data
-      await prefs.setBool('isLoggedIn', false);
+      await prefs.remove('isLoggedIn');
+      await prefs.remove('loggedInUserId');
 
       Navigator.pushReplacement(
         context,
@@ -102,6 +106,8 @@ class TodoProvider extends BaseViewModal {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Task added successfully')),
     );
+    titleController.clear();
+    descriptionController.clear();
     await loadTasks();
   }
 
@@ -229,5 +235,11 @@ class TodoProvider extends BaseViewModal {
     if (confirm) {
       await deleteTask(taskId);
     }
+  }
+
+  void reorderTasks(List<TodoTask> taskList, int oldIndex, int newIndex) {
+    final task = taskList.removeAt(oldIndex);
+    taskList.insert(newIndex, task);
+    notifyListeners();
   }
 }

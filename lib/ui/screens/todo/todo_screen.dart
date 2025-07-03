@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:to_do_list/core/models/to_do_task_model.dart';
 import 'package:to_do_list/ui/screens/todo/todo_provider.dart';
 
+import '../../widgets/button.dart';
+
 class TodoScreen extends StatefulWidget {
   String? userId;
   TodoScreen({super.key, this.userId});
@@ -28,6 +30,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
       child: Consumer<TodoProvider>(builder: (context, provider, _) {
         return Scaffold(
           appBar: AppBar(
+            backgroundColor: Colors.grey[200],
             actions: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -39,7 +42,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
                 ),
               ),
             ],
-            title: Text("To Do AP"),
+            //  title: Text("To Do AP"),
           ),
           body: Container(
             decoration: BoxDecoration(
@@ -52,14 +55,14 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
                 Expanded(
                   flex: 1,
                   child: Container(
-                    width: MediaQuery.of(context).size.width < 700 ? 250 : 300,
+                    width: MediaQuery.of(context).size.width < 700 ? 220 : 300,
                     color: Colors.grey[200],
                     padding: const EdgeInsets.all(16),
                     child: AddTaskForm(),
                   ),
                 ),
                 Expanded(
-                  flex: 2,
+                  flex: 3,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -144,24 +147,31 @@ class TaskListView extends StatelessWidget {
 
     if (filteredTasks.isEmpty) {
       return const Center(
-          child: Text(
-        "📝 No tasks in this tab.",
-        style: TextStyle(color: Colors.white),
-      ));
+        child: Text(
+          "📝 No tasks in this tab.",
+          style: TextStyle(color: Colors.white),
+        ),
+      );
     }
 
-    return ListView.separated(
+    return ReorderableListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: filteredTasks.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      onReorder: (oldIndex, newIndex) {
+        // Adjust the index when reordering downward
+        if (newIndex > oldIndex) newIndex -= 1;
+        todoProvider.reorderTasks(filteredTasks, oldIndex, newIndex);
+      },
       itemBuilder: (context, index) {
         final task = filteredTasks[index];
         final isCompleted = task.status == 'Completed';
 
         return Card(
+          key: ValueKey(task.id), // Required for reordering
           elevation: 3,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: ListTile(
             leading: Icon(
               isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
@@ -211,11 +221,13 @@ class AddTaskForm extends StatelessWidget {
         const Text("➕ Add New Task", style: TextStyle(fontSize: 20)),
         const SizedBox(height: 20),
         TextField(
+          controller: provider.titleController,
           onChanged: (val) => provider.todoTask.title = val,
           decoration: const InputDecoration(labelText: 'Title'),
         ),
         const SizedBox(height: 10),
         TextField(
+          controller: provider.descriptionController,
           onChanged: (val) => provider.todoTask.description = val,
           decoration: const InputDecoration(labelText: 'Description'),
           maxLines: 3,
@@ -235,16 +247,14 @@ class AddTaskForm extends StatelessWidget {
           decoration: const InputDecoration(labelText: 'Status'),
         ),
         const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () => provider.addTask(context, provider.todoTask),
-            icon: const Icon(Icons.add),
-            label: const Text('Add Task'),
-            style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 192, 148, 199)),
-          ),
+        // Update the path accordingly
+
+        GradientButtonWithIcon(
+          onPressed: () => provider.addTask(context, provider.todoTask),
+          icon: Icons.add,
+          label: 'Add Task',
         ),
+
         const SizedBox(height: 40),
       ],
     );

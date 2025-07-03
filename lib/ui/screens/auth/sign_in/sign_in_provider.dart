@@ -12,19 +12,25 @@ class SignInProvider extends BaseViewModal {
   final passwordController = TextEditingController();
   final authServices = AuthServices();
   AppUser appUser = AppUser();
+  bool isLoading = false;
 
   /// Authenticates the user and navigates to the Todo screen if successful
   Future<void> loginUser(BuildContext context, AppUser appUser) async {
     try {
-      setState(ViewState.busy);
-
+      isLoading = true;
+      notifyListeners();
       final user = await authServices.getUserByEmailAndPassword(
         appUser.email ?? '',
         appUser.password ?? '',
       );
 
-      setState(ViewState.idle);
+      Future.delayed(Duration(seconds: 2), () {
+        // Your code here
+        print('Delayed function executed');
+      });
 
+      isLoading = false;
+      notifyListeners();
       if (user != null) {
         // Save login state and user ID in shared preferences
         final prefs = await SharedPreferences.getInstance();
@@ -56,4 +62,5 @@ class SignInProvider extends BaseViewModal {
       );
     }
   }
+//
 }
