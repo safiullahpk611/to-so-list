@@ -4,6 +4,8 @@ import 'package:to_do_list/core/models/app_user.dart';
 import 'package:to_do_list/core/models/base_view_model.dart';
 import 'package:to_do_list/core/services/auth_services.dart';
 import 'package:to_do_list/core/services/view_state.dart';
+import 'package:to_do_list/core/utils/snack_bar.dart';
+import 'package:to_do_list/ui/screens/auth/sign_in/sign_in.dart';
 import 'package:to_do_list/ui/screens/todo/todo_screen.dart';
 
 class SignUpProvider extends BaseViewModal {
@@ -22,37 +24,48 @@ class SignUpProvider extends BaseViewModal {
       user.appUserId = "";
       isLoading = true;
       notifyListeners();
-      final userInsertResult = await authServices.insertUser(user);
-
+      final resultSucess = await authServices.insertUser(user);
+      Future.delayed(Duration(seconds: 2), () {
+        // Your code here
+        print('Delayed function executed');
+      });
       isLoading = false;
       notifyListeners();
-      if (userInsertResult != null) {
-        final newUserId = userInsertResult.user!.appUserId!;
+      if (resultSucess) {
+       
         final prefs = await SharedPreferences.getInstance();
+        //  print("new user id${newUserId}");
         await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('loggedInUserId', newUserId);
+    
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User registered successfully')),
+        CustomSnackBar.show(
+          context,
+          message: "User registered successfully!",
+          type: SnackBarType.success,
         );
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => TodoScreen(userId: newUserId),
+            builder: (_) => SignInScreen(),
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('User already registered with this email')),
+        CustomSnackBar.show(
+          context,
+          message: "User already registered!",
+          type: SnackBarType.warning,
         );
       }
     } catch (e) {
       setState(ViewState.idle);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+      CustomSnackBar.show(
+        context,
+        message: 'Error during sign up: $e',
+        type: SnackBarType.error,
       );
     }
   }
+
+//
 }

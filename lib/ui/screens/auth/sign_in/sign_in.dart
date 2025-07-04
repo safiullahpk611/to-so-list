@@ -48,8 +48,14 @@ class SignInScreen extends StatelessWidget {
               ),
               child: Center(
                 child: SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 450),
+                    child: LayoutBuilder(builder: (context, constraints) {
+                  double width = constraints.maxWidth;
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: width > 600
+                          ? 500
+                          : double.infinity, // wider for desktop
+                    ),
                     child: AuthFormContainer(
                       child: Form(
                         key: model.formKey,
@@ -151,8 +157,8 @@ class SignInScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                })),
               ),
             ),
           );

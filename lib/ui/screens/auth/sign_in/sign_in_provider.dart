@@ -4,6 +4,7 @@ import 'package:to_do_list/core/models/app_user.dart';
 import 'package:to_do_list/core/models/base_view_model.dart';
 import 'package:to_do_list/core/services/auth_services.dart';
 import 'package:to_do_list/core/services/view_state.dart';
+import 'package:to_do_list/core/utils/snack_bar.dart';
 import 'package:to_do_list/ui/screens/todo/todo_screen.dart';
 
 class SignInProvider extends BaseViewModal {
@@ -37,10 +38,11 @@ class SignInProvider extends BaseViewModal {
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('loggedInUserId', user.appUserId!);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login successful')),
+        CustomSnackBar.show(
+          context,
+          message: 'Login successful!',
+          type: SnackBarType.success,
         );
-
         // Navigate to the Todo screen
         Navigator.pushReplacement(
           context,
@@ -50,15 +52,19 @@ class SignInProvider extends BaseViewModal {
         );
       } else {
         // Show invalid credentials error
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid email or password')),
+        CustomSnackBar.show(
+          context,
+          message: 'Invalid email or password!',
+          type: SnackBarType.warning,
         );
       }
     } catch (e) {
       // Show error message
       setState(ViewState.idle);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error during login: $e')),
+      CustomSnackBar.show(
+        context,
+        message: 'Error during sign In: $e',
+        type: SnackBarType.error,
       );
     }
   }

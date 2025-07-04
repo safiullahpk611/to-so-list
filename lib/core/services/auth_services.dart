@@ -4,12 +4,12 @@ import 'package:to_do_list/core/services/database_services.dart';
 
 class AuthServices {
   DatabaseServices databaseServices = DatabaseServices();
-  Future<UserInsertResult> insertUser(AppUser user) async {
+  Future<bool> insertUser(AppUser user) async {
     try {
       final exists = await userExists(user.email ?? '');
       if (exists) {
         print("User already registered with this email.");
-        return UserInsertResult(success: false, user: null);
+        return false;
       }
 
       final db = await databaseServices.database;
@@ -22,19 +22,11 @@ class AuthServices {
       print("User inserted into SQLite with id $id");
 
       // Return the inserted user (with id)
-      final insertedUser = UserInsertResult(
-          user: AppUser(
-              appUserId: id.toString(),
-              email: user.email,
-              password: user.password,
-              firstName: user.firstName,
-              lastName: user.lastName),
-          success: true);
 
-      return UserInsertResult(success: true, user: insertedUser.user);
+      return true;
     } catch (e) {
       print("Error inserting user: $e");
-      return UserInsertResult(success: false, user: null);
+      return false;
     }
   }
 

@@ -13,6 +13,7 @@ class TodoScreen extends StatefulWidget {
   State<TodoScreen> createState() => _TodoScreenState();
 }
 
+//
 class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   late TabController _tabController;
 
@@ -146,10 +147,29 @@ class TaskListView extends StatelessWidget {
     final filteredTasks = todoProvider.getFilteredTasks(filter);
 
     if (filteredTasks.isEmpty) {
-      return const Center(
-        child: Text(
-          "📝 No tasks in this tab.",
-          style: TextStyle(color: Colors.white),
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.inbox, // You can change this to match the app theme
+              size: 60,
+              color: Colors.white54,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              filter == "All"
+                  ? "No tasks added yet!"
+                  : "No tasks in \"$filter\"",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+          ],
         ),
       );
     }

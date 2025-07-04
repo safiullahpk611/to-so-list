@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do_list/core/models/base_view_model.dart';
 import 'package:to_do_list/core/models/to_do_task_model.dart';
 import 'package:to_do_list/core/services/database_storage.dart';
+import 'package:to_do_list/core/utils/snack_bar.dart';
 import 'package:to_do_list/ui/screens/auth/sign_in/sign_in.dart';
 
 class TodoProvider extends BaseViewModal {
@@ -32,7 +33,7 @@ class TodoProvider extends BaseViewModal {
     updatedAt: '',
   );
 
-  /// List of all tasks for the current user
+  /// List of all tasks for the current userd
   List<TodoTask> tasks = [];
 
   /// Save user ID and load tasks
@@ -103,9 +104,12 @@ class TodoProvider extends BaseViewModal {
     );
 
     final res = await _dbStorage.addTask(newTask);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Task added successfully')),
+    CustomSnackBar.show(
+      context,
+      message: "Task added successfully'",
+      type: SnackBarType.success,
     );
+
     titleController.clear();
     descriptionController.clear();
     await loadTasks();

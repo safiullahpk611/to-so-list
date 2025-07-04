@@ -1,6 +1,7 @@
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 import 'package:to_do_list/core/models/app_user.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DatabaseServices {
   static Database? _db;
@@ -8,10 +9,17 @@ class DatabaseServices {
   /// Initializes the database and creates tables schema if not exist
   Future<Database> _initDB() async {
     try {
-      final dbPath = await databaseFactoryFfi.getDatabasesPath();
-      final path = join(dbPath, 'todo_app.db');
+      // Use path_provider to get a writable app-specific directory
+      final directory = await getApplicationDocumentsDirectory();
+      final path = join(directory.path, 'todo_apps.db');
 
-      return await databaseFactoryFfi.openDatabase(
+      print("📁 Writable DB path: $path");
+
+      // Use FFI for desktop
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+
+      return await databaseFactory.openDatabase(
         path,
         options: OpenDatabaseOptions(
           version: 1,
@@ -20,7 +28,7 @@ class DatabaseServices {
         ),
       );
     } catch (e) {
-      print('Error initializing database: $e');
+      print('❌ Error initializing database: $e');
       rethrow;
     }
   }

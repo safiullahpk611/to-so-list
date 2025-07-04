@@ -139,7 +139,9 @@ class Signup extends StatelessWidget {
                                     model.userSignUp(context, model.appUser);
                                   }
                                 },
-                                icon: Icons.person_add,
+                                icon: model.isLoading
+                                    ? Icons.circle
+                                    : Icons.person_add,
                                 label:
                                     model.isLoading ? 'loading...' : 'SignUp'),
                             const SizedBox(height: 24),
