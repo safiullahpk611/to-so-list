@@ -177,8 +177,8 @@ class TaskListView extends StatelessWidget {
     return ReorderableListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: filteredTasks.length,
+      buildDefaultDragHandles: false, // Disable default handle
       onReorder: (oldIndex, newIndex) {
-        // Adjust the index when reordering downward
         if (newIndex > oldIndex) newIndex -= 1;
         todoProvider.reorderTasks(filteredTasks, oldIndex, newIndex);
       },
@@ -186,41 +186,44 @@ class TaskListView extends StatelessWidget {
         final task = filteredTasks[index];
         final isCompleted = task.status == 'Completed';
 
-        return Card(
-          key: ValueKey(task.id), // Required for reordering
-          elevation: 3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: ListTile(
-            leading: Icon(
-              isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: isCompleted ? Colors.green : Colors.orange,
+        return ReorderableDragStartListener(
+          index: index,
+          key: ValueKey(task.id),
+          child: Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            title: Text(
-              task.title,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                decoration: isCompleted ? TextDecoration.lineThrough : null,
+            child: ListTile(
+              leading: Icon(
+                isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+                color: isCompleted ? Colors.green : Colors.orange,
               ),
-            ),
-            subtitle: Text(task.description),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    todoProvider.showEditDialog(context, task);
-                  },
-                  icon: const Icon(Icons.edit),
+              title: Text(
+                task.title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  decoration: isCompleted ? TextDecoration.lineThrough : null,
                 ),
-                IconButton(
-                  onPressed: () {
-                    todoProvider.handleDeleteTask(context, task.id!);
-                  },
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                ),
-              ],
+              ),
+              subtitle: Text(task.description),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      todoProvider.showEditDialog(context, task);
+                    },
+                    icon: const Icon(Icons.edit),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      todoProvider.handleDeleteTask(context, task.id!);
+                    },
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                  ),
+                ],
+              ),
             ),
           ),
         );
