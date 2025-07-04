@@ -106,7 +106,7 @@ class TodoProvider extends BaseViewModal {
     final res = await _dbStorage.addTask(newTask);
     CustomSnackBar.show(
       context,
-      message: "Task added successfully'",
+      message: "Task added successfully",
       type: SnackBarType.success,
     );
 
